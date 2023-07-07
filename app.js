@@ -52,8 +52,16 @@ app.post("/users/new", async (req, res) => {
   });
 });
 
-app.get("/userid", async (req, res) => {
-  const { id } = req.query;
+app.get("/userid/special", (req, res) => {
+  res.json({
+    success: true,
+    message: "Just Joking",
+  });
+});
+
+//Dynamic Routes should always be in the last
+app.get("/userid/:id", async (req, res) => {
+  const { id } = req.params;
   const user = await User.findById(id);
   res.json({
     success: true,
