@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./routes/user.js";
 import { config } from "dotenv";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
@@ -11,7 +12,10 @@ config({
 
 //Using Middleware
 app.use(express.json());
-app.use("/users", userRouter);
+app.use(cookieParser());
+
+//using routes
+app.use("/api/v1/users", userRouter);
 
 app.get("/", (req, res) => {
   res.send("Nice Working");
