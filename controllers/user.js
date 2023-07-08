@@ -3,39 +3,38 @@ import bcrypt from "bcrypt";
 import { sendCookie } from "../utils/features.js";
 import ErrorHandler from "../middlewares/error.js";
 
-export const getAllUsers = async (req, res) => {
-  const users = await User.find({});
-  console.log(req.query.keyword);
-
-  res.json({
-    success: true,
-    users,
-  });
-};
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) return next(new ErrorHandler("Invalid Email or Password", 404));
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) return next(new ErrorHandler("Invalid Email or Password", 404));
 
-  const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!isMatch) return next(new ErrorHandler("Invalid Password", 404));
+    if (!isMatch) return next(new ErrorHandler("Invalid Password", 404));
 
-  sendCookie(user, res, `Welcome Back,${user.name}`, 200);
+    sendCookie(user, res, `Welcome Back,${user.name}`, 200);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
-  let user = await User.findOne({ email });
-  if (user) return next(new ErrorHandler("User Already Exists!", 404));
+  try {
+    const { name, email, password } = req.body;
+    let user = await User.findOne({ email });
+    if (user) return next(new ErrorHandler("User Already Exists!", 404));
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  user = await User.create({ name, email, password: hashedPassword });
+    user = await User.create({ name, email, password: hashedPassword });
 
-  sendCookie(user, res, "Registered Succefully", 201);
+    sendCookie(user, res, "Registered Succefully", 201);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getMyProfile = (req, res) => {
